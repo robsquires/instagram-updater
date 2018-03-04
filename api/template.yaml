@@ -1,0 +1,47 @@
+Resources:
+  GeneratePreview:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.generatePreview
+      Runtime: nodejs6.10
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /preview
+            Method: post
+        Cors:
+          Type: Api
+          Properties:
+            Path: /preview
+            Method: options
+      Environment:
+        Variables:
+          BUCKET_NAME: delta-tee-rob
+          SITE_URL: https://s3-eu-west-1.amazonaws.com
+          AUTH_KEY: '1234'
+          ALLOWED_HOST: http://localhost:8080
+  Publish:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: index.publish
+      Runtime: nodejs6.10
+      Events:
+        Api:
+          Type: Api
+          Properties:
+            Path: /publish
+            Method: post
+        Cors:
+          Type: Api
+          Properties:
+            Path: /publish
+            Method: options
+      Environment:
+        Variables:
+          BUCKET_NAME: delta-tee-rob
+          SITE_URL: https://s3-eu-west-1.amazonaws.com
+          AUTH_KEY: '1234'
+          ALLOWED_HOST: http://localhost:8080
+    
+          
