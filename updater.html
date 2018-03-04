@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style type="text/css">
+		html {
+			font-size: 16px;
+		}
+
+	</style>
+</head>
+
+<body>
+	<div >
+    <input
+      id='insta_url'
+      type=text
+      placeholder='Paste instagram link here'
+    />
+    <div id='preview'></div>
+    <div id='error'></div>
+    <div id='loader'>Loading</div>
+  </div>
+  
+
+  <script type="text/javascript">
+    const input = document.getElementById('insta_url')
+    const preview = document.getElementById('preview')
+    const error = document.getElementById('error')
+    const loader = document.getElementById('loader')
+
+    const authToken = window.location.hash.replace(/#(.*)/,'$1')
+    const view = {
+      loading: false,
+      error: null,
+      previewUrl: null,
+
+      set loading (value) {
+        loader.setAttribute('style', `display: ${value ? 'block' : 'none'}`)
+      },
+
+      set error (err) {
+        if (err) {
+          error.innerText = err.message
+        }
+        error.setAttribute('style', `display: ${err ? 'block' : 'none'}`)
+      },
+
+      set previewUrl (url) {
+        if (url) {
+          const a = document.createElement('a')
+          a.setAttribute('href', url)
+          a.setAttribute('target', '_blank')
+          a.innerText = 'View Preview'
+          preview.appendChild(a)
+        } else {
+          preview.innerHTML = null
+        }
+      }
+    }
+
+    view.loading = false
+    view.error = null
+    view.previewUrl = null
+
+    input.addEventListener('paste', e => execute(e.clipboardData.getData('text')))
+    
+    async function execute (instaLink) {
+      view.previewUrl = null
+      try {
+        const id = getId(instaLink)
+        view.loading = true
+        const { url } = await generatePreview(id)
+        await poll(() => fetchPreview(url))
+        view.loading = false
+        view.previewUrl = url
+      } catch (err) {
+        view.loading = false
+        view.error = err
+      }
+    }
+
+    function getId (link) {
+      const m = link.match(/instagram.com\/p\/([^\/]*)/)
+      const id = m ? m[1] : null
+      if (!id) {
+        throw new Error('Invalid link')
+      }
+      return id
+    }
+
+    function generatePreview (id) {
+      return fetch('https://mqsji7kv62.execute-api.eu-west-1.amazonaws.com/Prod/preview', {
+        method: 'post',
+        body: JSON.stringify({ id}),
+        headers: {
+          'X-Auth-Token': authToken,
+          'Content-Type': 'application/json'
+        }
+      })
+      .then((response) => response.json())
+    }
+
+    function fetchPreview (url) {
+      return fetch('http://localhost:8080/updater.html', {
+        headers: {
+          'X-Auth-Token': authToken,
+          'Content-Type': 'application/json'
+        }
+      }).then(response => {
+        if(!response.ok) {
+          throw new Error('preview not found!')
+        }
+      })
+    }
+
+    function poll (fn) {
+      return new Promise((resolve, reject) => {
+        function pollRecursive(count = 5) {
+          return fn()
+            .then(resolve)
+            .catch(err => {
+              if (count === 0) {
+                return reject(err)
+              }
+              count--
+              setTimeout(() => pollRecursive(count), 1500)
+            })
+        }
+        return pollRecursive()
+      })
+      
+    }
+
+  </script>
+</body>
+</html>
