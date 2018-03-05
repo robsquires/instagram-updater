@@ -1,0 +1,62 @@
+Resources:
+  GeneratePreview:
+    Properties:
+      CodeUri: s3://delta-tee-dev/761ba4b5d25212ed6a917275bd75f80a
+      Environment:
+        Variables:
+          ALLOWED_HOST: http://localhost:8080
+          AUTH_KEY: '1234'
+          BUCKET_NAME: delta-tee-rob
+          SITE_URL: https://s3-eu-west-1.amazonaws.com/delta-tee-rob
+      Events:
+        Api:
+          Properties:
+            Method: post
+            Path: /preview
+          Type: Api
+        Cors:
+          Properties:
+            Method: options
+            Path: /preview
+          Type: Api
+      Handler: index.generatePreview
+      Policies:
+      - Statement:
+        - Action:
+          - s3:*
+          Effect: Allow
+          Resource: arn:aws:s3:::delta-tee-rob/*
+        Version: '2012-10-17'
+      Runtime: nodejs6.10
+    Type: AWS::Serverless::Function
+  Publish:
+    Properties:
+      CodeUri: s3://delta-tee-dev/761ba4b5d25212ed6a917275bd75f80a
+      Environment:
+        Variables:
+          ALLOWED_HOST: http://localhost:8080
+          AUTH_KEY: '1234'
+          BUCKET_NAME: delta-tee-rob
+          SITE_URL: https://s3-eu-west-1.amazonaws.com/delta-tee-rob
+      Events:
+        Api:
+          Properties:
+            Method: post
+            Path: /publish
+          Type: Api
+        Cors:
+          Properties:
+            Method: options
+            Path: /publish
+          Type: Api
+      Handler: index.publish
+      Policies:
+      - Statement:
+        - Action:
+          - s3:*
+          Effect: Allow
+          Resource: arn:aws:s3:::delta-tee-rob/*
+        Version: '2012-10-17'
+      Runtime: nodejs6.10
+    Type: AWS::Serverless::Function
+Transform: AWS::Serverless-2016-10-31

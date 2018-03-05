@@ -1,9 +1,19 @@
+Transform: 'AWS::Serverless-2016-10-31'
+
 Resources:
   GeneratePreview:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: ./code
       Handler: index.generatePreview
       Runtime: nodejs6.10
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 's3:*'
+              Resource: 'arn:aws:s3:::delta-tee-rob/*'
       Events:
         Api:
           Type: Api
@@ -18,14 +28,22 @@ Resources:
       Environment:
         Variables:
           BUCKET_NAME: delta-tee-rob
-          SITE_URL: https://s3-eu-west-1.amazonaws.com
+          SITE_URL: https://s3-eu-west-1.amazonaws.com/delta-tee-rob
           AUTH_KEY: '1234'
           ALLOWED_HOST: http://localhost:8080
   Publish:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: ./code
       Handler: index.publish
       Runtime: nodejs6.10
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 's3:*'
+              Resource: 'arn:aws:s3:::delta-tee-rob/*'
       Events:
         Api:
           Type: Api
@@ -40,7 +58,7 @@ Resources:
       Environment:
         Variables:
           BUCKET_NAME: delta-tee-rob
-          SITE_URL: https://s3-eu-west-1.amazonaws.com
+          SITE_URL: https://s3-eu-west-1.amazonaws.com/delta-tee-rob
           AUTH_KEY: '1234'
           ALLOWED_HOST: http://localhost:8080
     

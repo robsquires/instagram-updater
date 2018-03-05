@@ -28,7 +28,7 @@ exports.generatePreview = (event, context, callback) => {
       callback(null, {
         statusCode: 500,
         body: JSON.stringify({error: err.message}),
-        headers: resHeaders
+        headers: getCorsHeaders()
       })
     })
 }
@@ -59,7 +59,7 @@ exports.publish = (event, context, callback) => {
       callback(null, {
         statusCode: 500,
         body: JSON.stringify({error: err.message}),
-        headers: resHeaders
+        headers: getCorsHeaders()
       })
     })
 }
